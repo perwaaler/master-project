@@ -7,6 +7,7 @@ negdata = negdata(find(negdata>u));
 negL = @(par) -sum( log(gppdf(negdata,par(2),par(1),u)) )
 negL([sigma shape])
 negloglik([sigma,shape],u,length(danger_FEA),danger_FEA')
+% this is my change! hello git!
 %%
 clf; plot(danger_FEA,'.'); ylim([-1,3])
 %% danger FEA analysis; Fitting for multiple thresholds
