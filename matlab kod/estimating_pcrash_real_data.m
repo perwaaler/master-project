@@ -1,0 +1,23 @@
+
+clf; plot(exp(-0.5*spainttc_stoch.TTCFEA), '.'); hold on; plot(0.2*ones(1,750));
+plot(0.45*ones(1,750))
+%% reciprical transformation analysis
+NN = length(DAFEA(:,1));
+clf
+delta = 2
+trans_DAFEA = 1./(delta+DAFEA).^2;
+plot(max(trans_DAFEA'),'.'); hold on
+plot(ones(1,NN)*.001); plot(ones(1,NN)*.03)
+
+
+%%
+
+U = linspace(.2 ,.45,m);
+s = 0.5
+u = 0.35
+param = fminsearch(@(par) negloglik(par, u, s, spainttc_stoch), [1 1])
+pu = p_exceed(u, s, spainttc_stoch);
+
+p = gppdf(1, param(2), param(1), u) * pu
+
+

@@ -1,0 +1,21 @@
+function out = negloglik(param,u)
+% computes negative loglikelihood function for a given threshold u (negated threshold), where datamatrix
+% contains the distributions for each encounter, with each row
+% corresponding to an encounter. N is the number of encounters.
+N = max(spainttc_stoch.ID)
+trans_data = exp(-spainttc_stoch.TTCFEA);
+sum_negloglik = 0;
+for k = 1:N
+    index = find(spainttc_stoch.ID == k);
+    nn = length(index);                                                  % number of possible outcomes at moment of first evasive action
+    trans_data_k = trans_data(index);
+    trans_data_k = trans_data_k( find(trans_data_k>u) );
+    term_k = -log(gppdf(trans_data_k, param(2), param(1), u));
+    negloglik = negloglik( find(~isnan(negloglik)) );
+    if length(negloglik) > 0
+        sum_negloglik = sum_negloglik + sum(negloglik)/nn;
+    end
+end
+
+out = sum_negloglik;
+end

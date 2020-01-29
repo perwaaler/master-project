@@ -1,0 +1,176 @@
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-14, -8), type = "GP", nint = 15, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -10
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-15, -8), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -10
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-15, -8), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -11
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1.1), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.6
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -0.9), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.2
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.8
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.3
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -0.8), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.3
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.2
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.3
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAttc")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAttc")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-4, -2), type = "GP", nint = 10, na.action = na.fail)
+dd <- get( "FEAttc")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-4, -2.2), type = "GP", nint = 10, na.action = na.fail)
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1.2), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.4
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -0.9), type = "GP", nint = 10, na.action = na.fail)
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.2
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1), type = "GP", nint = 25, na.action = na.fail)
+dd <- get( "FEAmindist")
+plot( dd[["data"]][,1], dd[["data"]][,2], xlab=colnames(dd[["data"]])[1], ylab=colnames(dd[["data"]])[2], pch="o")
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.1
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.2
+dd[["models"]][["fit2"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+cov.names <- character(0)
+dd <- get( "FEAmindist")
+xdat <- dd[["data"]]
+threshold.val <- -1.2
+dd[["models"]][["fit1"]] <- fit <- fevd( FEAmindist, data = xdat, threshold = threshold.val, threshold.fun = ~1, location.fun = ~ 1, scale.fun = ~ 1, shape.fun = ~ 1, use.phi = FALSE, units = "", time.units = "days", type = "GP", na.action = na.fail)
+print(fit)
+assign( "FEAmindist", dd, pos=".GlobalEnv")
+dd <- get( "FEAmindist")
+var.val <- dd[["data"]][, 2]
+threshrange.plot(x = var.val, r = c(-2, -1), type = "GP", nint = 10, na.action = na.fail)
