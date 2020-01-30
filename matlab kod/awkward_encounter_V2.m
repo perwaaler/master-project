@@ -1,6 +1,6 @@
 clear all
-pause_length = 1/4/2/2/2/2/2/2;
-plotting = 0;
+pause_length = 2^-10;
+
 % parameters for distribution of step-angle
 m = 5; % increase m --> less variance in stepsize
 alpha0 = m;
@@ -16,11 +16,13 @@ s = 0.35;   % decrease to make it harder to detect
 p = 1.3;   % increase to make it unlikelier to detect for large d, but more likely for small d
 plot(linspace(0,10,100),exp(-s*(linspace(0,10,100)+d).^p))
 
-% Collision Avoidance Parameters: Parameter-Modification Factor = exp( -s*((x + d)/k)^-p )
-d_ca1 = 0.01;    % increase to reduce PMF
-k_ca1 = 1.4;    % increase to decrease modification for x<k-d and reduce modification for x>k-d
-p_ca1 = 1.6;    % increases effect of avoidance modifier when 
-s_ca1 = 0.2
+% Collision Avoidance Parameters. Parameter-Modification Factor pmf: = exp( -s*((x + d)/k)^-p )
+% determines how dramatically the vehicles modify their behaviour once
+% detection has occured as a function of distance x between predicted future
+% positions. Smaller pmf results in more dramatic change of behaviour
+d_ca1 = 0.01;      % increase to reduce PMF
+p_ca1 = 1.6;       % increases effect of avoidance modifier when 
+s_ca1 = 3.4264e-1; % reduces pmf
 
 d_ca2 = 0.1;    % increase to reduce PMF
 k_ca2 = 2.6;    % increase to decrease modification for x<k-d and reduce modification for x>k-d
@@ -41,6 +43,8 @@ danger_CR = zeros(1,N);          % danger index at time of conflict resolution
 danger_nodetec = zeros(1,N);     % highest index of danger for non-detection encounters
 enc_type = zeros(1,N);           % vector containing encounter type of each encounter
 compute_ttc = 1;                 % tells the algorithm whether or not you want it to estimate ttc distribution for each encounter
+plotting = 1;
+
 for i=1:N
 % initiation
 first_detection = 0;     % They have not yet detected eachother
@@ -51,7 +55,7 @@ B_im = normrnd(0,sigma);
 A = A_real+1i*A_im;
 B = B_real+1i*B_im;
 % data collection variables
-detection_status = 0; 
+detection_status = 0;     % tracks detection status
 encounter_classifier = 1; % 1 --> (no detection, no crash), -1 --> (detection, no crash) 2 --> (no detection, crash), -2 --> (detection, crash)
 danger_vec = [];          % collects the danger index associated with each timestep
 detec_vec = [];    % tracks detection status, 1 --> detection at timeframe i, 0 --> no detection at timeframe i
@@ -66,6 +70,7 @@ detec_vec = [];    % tracks detection status, 1 --> detection at timeframe i, 0 
                 for k=1:NTTC
                     ttc = ttc_simulator(A,B,r, thetavar, a, b);
                     DAFEA(i,k) = ttc;
+                    
                 end
             end
             first_detection = 1;
@@ -76,20 +81,17 @@ detec_vec = [];    % tracks detection status, 1 --> detection at timeframe i, 0 
             danger_vec(length(danger_vec) + 1) = danger_index;
 
             % take next step
-            pred_posA = A + a*b; % prediction of the A's future position
-            pred_posB = B - a*b; % prediction of the A's future position
-            pred_diff = pred_posA - pred_posB; % difference vector between predicted future position of A and B
-            pred_dist = norm(pred_diff);       
-            alpha_modifier = mod_fac(pred_dist,d_ca1,k_ca1,p_ca1,s_ca1);
-            %theta_modifier = mod_fac(abs(imag(pred_diff)),d_ca2,k_ca2,p_ca2,s_ca2)
-            stepsize = gamrnd(a*alpha_modifier*[1 1],b*[1 1]); % step-size
-            %theta = betarnd(alpha0*theta_modifier*[1 1], beta0*[1 1]);
-            %theta = sign(imag(pred_diff))*[-1 -1].*(theta*theta_range - 0.5*theta_range); % step-angle
+            pred_posA = A + a*b;                                      % prediction of the A's future position
+            pred_posB = B - a*b;                                      % prediction of the B's future position
+            pred_diff = pred_posA - pred_posB;                        % difference vector between predicted future position of A and B
+            pred_dist = norm(pred_diff);                              % predicted distance between A and B at next time-step   
+            alpha_modifier = exp(-s_ca1*(pred_dist + d_ca1).^-p_ca1); % determines how much speed is reduced once evasive action is taken
+            stepsize = gamrnd(a*alpha_modifier*[1 1],b*[1 1]);
             theta = thetavar*[randn(1) + thetamod*sign(imag(pred_diff))*exppdf(abs(imag(pred_diff)), 1), randn(1) + thetamod*sign(imag(pred_diff))*exppdf(abs(imag(pred_diff)), 1)];
             A = A + stepsize(1)*exp(1i*theta(1));
             B = B - stepsize(2)*exp(1i*theta(2));
             
-            % plotting %
+            %%% plotting %%%
             if plotting == 1
                 xlim([-xinit,xinit])
                 ylim([-4,4])
@@ -102,14 +104,14 @@ detec_vec = [];    % tracks detection status, 1 --> detection at timeframe i, 0 
                 hold off
                 pause(pause_length)
             end
-            if norm(A-B) < 2*r
+            if norm(A-B) < 2*r                                        % condition for collision has been met
                 hold on
                 title("collision")
                 hold off
                 detec_vec(length(detec_vec) + 1) = 1;
                 danger_index = norm(A-B) - 2*r;
-                danger_vec(length(danger_vec) + 1) = danger_index;
-                encounter_classifier = -2;
+                danger_vec(length(danger_vec) + 1) = danger_index; % append danger index of timeframe
+                encounter_classifier = -2;                            
                 break
             end
         %%%%%%%%%%%%%%%% no detection %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
