@@ -12,8 +12,8 @@ negloglik([sigma,shape],u,length(danger_FEA),danger_FEA')
 clf; plot(danger_FEA,'.'); ylim([-1,3])
 %% danger FEA analysis; Fitting for multiple thresholds
 p_EA = (sum(enc_type==-1)+sum(enc_type==-2))/N
-m=20;
-U2 = linspace(-3,-0.5,m);
+m=10;
+U2 = linspace(-3,-0.8,m);
 parameters2 = zeros(2,m);
 p_nea2 = zeros(1,m);
 UE2 = zeros(1,m);
@@ -37,7 +37,7 @@ for k=1:m
     clf; plot(sort(neg_pot), F_inv( [1:NN] /(NN+1), param2(1),param2(2)) ,'.');
     hold on
     plot(sort(neg_pot), sort(neg_pot)); hold off
-    pause(1)
+    pause(0)
     
 end
 clf
