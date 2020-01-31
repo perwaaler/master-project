@@ -1,4 +1,4 @@
-git config --global user.email perwaaler@gmail.com   %% sets user email
+git config --global user.email perwaaler@gmail.com   %%sets user email
 git config --global user.name theper                 %%sets user name
 mkdir test                                           %%create a directory called "test"
 cd ..                                                %%leave current folder
@@ -19,7 +19,7 @@ git log --oneline                                    %%more condensed log of com
 git checkout 24e2f0b                                 %%goes back to the commit corresponding to the id (does not allow you to edit anything)
 git revert 24e2f0b --hard                            %%goes back to that commit and deletes all later commits
 git --help                                           %%lists all commands that starts with git, such as "git add", "git log" etc.
-git branch feature-1				     %%creates a new branch
+git branch feature-1				                         %%creates a new branch
 git branch -a                                        %%shows all branches
 git checkout feature-1                               %%switches to the branch named feature-1
 git checkout master                                  %%switch to master branch
@@ -27,4 +27,3 @@ git branch -D feature-1                              %%deletes branch, use capit
 git checkout -b feature-a                            %%creates branch AND switches to that branch
 git mearge feature-b                                 %%merges the branch with the master branch
 git commit                                           %%use this command after the conflict has been resolved. When scary text appears, press SHIFT+:, and type wq and press enter
-

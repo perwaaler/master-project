@@ -1,6 +1,8 @@
 %% optimization for particular threshold u for DAFEA
-clf;plot(min(DAFEA'),'.');ylim([-1,10])
+Nenc = length(DAFEA(:,1));
+clf;plot(min(DAFEA'),'.');ylim([-1,10]); hold on; plot(ones(1,Nenc)*5)
 %%
+Nenc = length(DAFEA(:,1));                                 % number of encounters where there was evasive action
 Nbs = 100;                                                 % number of bootstrapped samples
 init = [0.3 -.5]                                           % initial parameter guess
 negdata = -DAFEA(:);                                       % negate data
@@ -16,7 +18,6 @@ for k=1:m
     negdata = negdata(find(negdata>u));                        % selects exceedences only
     negL = @(par) -sum( log(gppdf(negdata,par(2),par(1),u)) ); % define negative log-likelihood function
     param = fminsearch(negL,init);                             % obtain parameter estimate
-    Nenc = length(DAFEA(:,1));                                 % number of encounters where there was evasive action
 
     xi_sample = zeros(1,Nbs);
     init_temp = init;
@@ -94,4 +95,3 @@ negL(param_temp)
 options = optimset('PlotFcns',@optimplotfval);
 param_bs = fminsearch(negL,param_temp, options)
 param_bs==param_temp
-

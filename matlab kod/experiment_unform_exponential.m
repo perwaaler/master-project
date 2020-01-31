@@ -7,7 +7,7 @@
 % the GEV family, making the assumption that the exceedences are GPPD
 % distributed precise.
 
-N = 10000;           % number of outer loops
+N = 2000;           % number of outer loops
 n = 500;            % number of datapoints generated each loop
 psave = zeros(2,N); % saves estimates of probabily for each method
 
@@ -17,9 +17,11 @@ u_exp = -log(1 - u_uni);    % corresponding threshold for transformed data
 u0 = 0.98;                  % we are estimating P(X>u0). Note that the true probability is 1 - u0.
 u0_trans = log(1/(1 - u0)); % corresponding value for transformed data
 
+par_uni_save = zeros(2,N);
+par_exp_save = zeros(2,N);
 % initial values for log-likelihood minimization
 exp_init = [1 0]; 
-uni_init = [1 -0.1];
+uni_init = [0.1 -0.1];
 
 for k = 1:N
     uni_sample = rand(1,n);
@@ -38,11 +40,11 @@ for k = 1:N
     
     % try new initial guess in case of bad initial guess
     while par_uni == uni_init_temp
-        uni_init_temp = [max(0.1, uni_init(1) + normrnd(0, 1.4^2)), uni_init(2) + normrnd(0,1.4^2)];
+        uni_init_temp = [max(0.1, uni_init(1) + normrnd(0, 0.5)), uni_init(2) + normrnd(0,0.5)];
         par_uni = fminsearch(@(par) negL(par, uni_exceed, u_uni), uni_init_temp);
     end
     while par_exp == exp_init_temp
-        exp_init_temp = [max(0.1, exp_init(1) + normrnd(0, 1.4^2)), exp_init(2) + normrnd(0,1.4^2)];
+        exp_init_temp = [max(0.1, exp_init(1) + normrnd(0,0.5)), exp_init(2) + normrnd(0,0.5)];
         par_exp = fminsearch(@(par) negL(par, exp_exceed, u_exp), exp_init_temp);
     end
 
@@ -54,7 +56,8 @@ for k = 1:N
     
     % save estimated probabilities
     psave(:,k) = [p0_uni;p0_exp];
-
+    par_uni_save(:,k) = par_uni';
+    par_exp_save(:,k) = par_exp';
 end
 
 %% Plots of estimates along with 95% confidence intervals
@@ -68,10 +71,9 @@ ci_exp = m_exp + [-1 1]*1.96*sdev_exp
 clf
 subplot(211)
 plot(psave(1,:),'.')
-hold on; plot(m_uni*ones(1,N)); plot(ci_uni(1)*ones(1,N)); plot(ci_uni(2)*ones(1,N)); hold off
+hold on; plot(m_uni*ones(1,N),'r'); plot(ci_uni(1)*ones(1,N),'b'); plot(ci_uni(2)*ones(1,N),'b');plot(0.02*ones(1,N),'g'); hold off 
 title('estimate using non-transformed data')
 subplot(212)
 plot(psave(2,:),'.')
-hold on; plot(m_exp*ones(1,N)); plot(ci_exp(1)*ones(1,N)); plot(ci_exp(2)*ones(1,N)); hold off
+hold on; plot(m_exp*ones(1,N),'r'); plot(ci_exp(1)*ones(1,N),'b'); plot(ci_exp(2)*ones(1,N),'b');plot(0.02*ones(1,N),'g'); hold off
 title('estimate using transformed data')
-
