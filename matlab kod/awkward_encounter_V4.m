@@ -196,4 +196,4 @@ DAFEA(find(enc_type==1),:) = [];
 danger_max_EA(find(enc_type==1),:) = [];
 
 danger_max_EA = min(danger_max_EA'); % find most dangerous moment during attempt to avoid collision
-danger_max_nodetec = danger_max_nodetec(find(danger_max_nodetec ~= nan));
+danger_max_nodetec = danger_max_nodetec( find(isnan(danger_max_nodetec)==0) );
