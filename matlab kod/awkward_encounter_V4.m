@@ -1,5 +1,5 @@
 % simulation of encounters between two vehicles.
-% hi
+
 clear all
 pause_length = 2^-5;
 
