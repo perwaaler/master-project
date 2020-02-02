@@ -1,31 +1,32 @@
 %% ANALYSIS ON TRANSFORMED DATA!!!
-Nenc = length(DAFEA(:,1))
-u_lower = 4.5
+data_matrix = X
+Nenc = length(X(:,1))
+u_lower = 4
 u_upper = 9
-clf;plot(min(DAFEA'),'.'); hold on; plot(ones(1,Nenc)*u_lower); plot(ones(1,Nenc)*u_upper)
-ylim([0,30])
+clf;plot(min(X'),'.'); hold on; plot(ones(1,Nenc)*u_lower); plot(ones(1,Nenc)*u_upper)
+ylim([-1,30])
 %% reciprical transformation analysis
 p=4
 delta = 1
 %trans = @(x)1./(delta + x).^p
-trans = @(x)exp(-.8*(x - 2))
+trans = @(x)exp(-.3*(x - 2))
 %trans = @(x) -x
-Nenc = length(DAFEA(:,1));
+Nenc = length(data_matrix(:,1));
 clf
 
 
 u_lower_trans = trans(u_upper)
 u_upper_trans = trans(u_lower)
 
-trans_DAFEA = trans(DAFEA);
+trans_DAFEA = trans(data_matrix);
 clf; plot(max(trans_DAFEA'),'.'); hold on
 plot(ones(1,Nenc)*u_lower_trans); plot(ones(1,Nenc)*u_upper_trans)
 %%
 
-Nenc = length(DAFEA(:,1));         % number of encounters for which there was interaction
+Nenc = length(data_matrix(:,1));         % number of encounters for which there was interaction
 compute_ci = 1;                    % set equal to one if confidence intervals for xi are desired
 Nbs = 100;                         % number of bootstrapped samples to compute standard error
-trans_DAFEA = trans(DAFEA);
+trans_DAFEA = trans(data_matrix);
 p_EA = (sum(enc_type==-1)+sum(enc_type==-2) + sum(enc_type==2))/N; % probability for encounter to be interactive
 m = 10;                                                    % number of thresholds used for estimation
 init = [1 .8];                                             % initial guess
@@ -45,7 +46,7 @@ for k=1:m
         param = fminsearch(negL,init)
     end
     parameters(:,k) = param;
-    p_u = sum(sum((trans_DAFEA)>U(k)))/( length(DAFEA(1,:))*length(DAFEA(:,1)) );
+    p_u = sum(sum((trans_DAFEA)>U(k)))/( length(data_matrix(1,:))*length(data_matrix(:,1)) );
     p_nea(k) = p_u*(max(0,1 + param(2)*(trans(0) - U(k))/param(1)) )^(-1/param(2)) * p_EA
 
 
