@@ -1,8 +1,8 @@
 function out = ttc_simulator(A0,B0,stepsize0,theta0,min_stepsize,sigma_step, r, thetavar,stability_fac)
 % out = ttc_simulator(A0,B0,stepsize0,min_stepsize,sigma_step, r, thetavar)
-% This function generates a randomw walk that starting at position A= and
+% This function generates a random walk starting at position A0 and
 % B0 respectively, and then computes Time To Collision. TTC is set to 1000
-% if collition never occurs.
+% if collision never occurs.
 
 stepcounter = 0;
 if real(A0)>=real(B0)
@@ -16,11 +16,12 @@ while real(A0)<real(B0)
             stepsize0(2) = max(min_stepsize, stepsize0(2));
             A1 = A0 + stepsize0(1)*exp(1i*theta0(1));
             B1 = B0 - stepsize0(2)*exp(1i*theta0(2));            % solve system to find ttc, if on collision course
-            Adiff = A1-A0;
-            Bdiff = B1-B0;
-            eta = real(conj(Adiff - Bdiff)*(A0-B0))/norm(Adiff-Bdiff)^2;
-            mu = (norm(A0 - B0)^2 - 4*r^2)/norm(Adiff - Bdiff)^2;
-            ttc = -eta + [-1 1]*sqrt(eta^2-mu);
+            if norm(A1-B1)<2*r
+                Adiff = A1-A0;
+                Bdiff = B1-B0;
+                eta = real(conj(Adiff - Bdiff)*(A0-B0))/norm(Adiff-Bdiff)^2;
+                mu = (norm(A0 - B0)^2 - 4*r^2)/norm(Adiff - Bdiff)^2;
+                ttc = -eta + [-1 1]*sqrt(eta^2-mu);
             if imag(ttc)==0
                 ttc = min(ttc);
                 break

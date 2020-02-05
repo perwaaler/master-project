@@ -83,7 +83,7 @@ danger_enc_i = [];        % collects the danger index associated with each times
             % saving information in vectors, and updating status
             if first_detection == 0 & compute_ttc == 1 % a loop that collects information at first moment of evasive action
                 for k=1:NTTC
-                    ttc = ttc_simulator_double_momentum(A0,B0,stepsize,theta,min_stepsize,var_step,r, thetavar, stability_fac);
+                    ttc = ttc_simulator_double_momentum_improved(A0,B0,stepsize,theta,min_stepsize,var_step,r, thetavar, stability_fac);
                     DAFEA(i,k) = ttc;
                 end
                 danger_FEA(i) = norm(A0-B0) - 2*r;
@@ -177,7 +177,7 @@ danger_enc_i = [];        % collects the danger index associated with each times
                 ttc = -eta + [-1 1]*sqrt(eta^2-mu);
                 ttc = -max(ttc);
                 DAFEA(i,:) = ttc*ones(1,NTTC);
-
+                
                 danger_enc_i(length(danger_enc_i) + 1) = danger_index;
                 danger_max(i) = danger_index;
                 encounter_classifier = 2;                                  % indicates a collision with no evasive action attempted
@@ -215,7 +215,7 @@ danger_max_EA(find(enc_type==1),:) = [];
 danger_max_EA = min(danger_max_EA'); % find most dangerous moment during attempt to avoid collision
 danger_max_nodetec = danger_max_nodetec( find(isnan(danger_max_nodetec)==0) );
 
-%% 
+%% Compute minimum ttc for all encounters where there was not evasive action
 N_enc_type1 = sum(enc_type==1);
 %NTTC = 200;                         % determines how many ttc samples to draw at each timeframe
 A_NEA = A_save(find(enc_type==1),:);
@@ -244,7 +244,7 @@ for i=1:N_enc_type1
                 stepsize = [A_stepsize_save(i), B_stepsize_save(i)];
                 
                 for k=1:NTTC
-                    ttc = ttc_simulator_double_momentum(A0,B0,stepsize,theta,min_stepsize,var_step,r, thetavar, stability_fac);
+                    ttc = ttc_simulator_double_momentum_improved(A0,B0,stepsize,theta,min_stepsize,var_step,r, thetavar, stability_fac);
                     if ttc< 1000
                         pause(0.0)
                     end
@@ -270,5 +270,5 @@ for i=1:N_enc_type1
     end
 end
      
- X(find(enc_type==1),:) = ttc_dist_save   % vector that contains ttc-data from all encounters.
+ X(find(enc_type==1),:) = ttc_dist_save;   % vector that contains ttc-data from all encounters.
  

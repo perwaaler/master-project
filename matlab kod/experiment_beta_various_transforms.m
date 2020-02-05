@@ -8,8 +8,8 @@
 % of dipping below such a threshold often being estimated to be zero.
 
 
-N = 2000;           % number of iterations
-n = 2000;           % number of samples generated each iteration
+N = 500;           % number of iterations
+n = 500;           % number of samples generated each iteration
 
 % parameter values of the beta distribution
 a = 6;
@@ -25,7 +25,7 @@ psave = zeros(2,N);     % saves estimates for each iteration
 par_beta_save = zeros(2,N);
 par_inv_save = zeros(2,N);
 ue_beta = zeros(1,N);   % saves estimates of lower endpoints of beta distribution
-trans = @(x) 1./x.^4    % specifies the type of transformation to use
+trans = @(x) -x%1./x.^4    % specifies the type of transformation to use
 min_beta = zeros(1,N)   % collects the smallest value from each beta-sample. Used to compare against estimated lower endpoint
 
 u0 = -0.08;             % we are estimating P(X>u0)

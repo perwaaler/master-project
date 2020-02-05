@@ -108,7 +108,7 @@ Nenc = length(DAFEA(:,1));
 p_nea = zeros(1,m);
 xi_sample = zeros(m,50);
 xi_init = -0.5;
-upper_endpoint = zeros(1,m);
+upper_endpoint = [0]
 ci_bs = 0;
 for k=1:m
     k
@@ -124,7 +124,6 @@ for k=1:m
     p_u = sum(sum((DAFEA)<-U(k)))/( length(DAFEA(1,:))*length(DAFEA(:,1)) )
     ue = U(k) - param(1)/param(2)
     p_nea(k) = p_u*(max(0,1 + param(2)*(0 - U(k))/param(1)) )^(-1/param(2)) * p_EA;
-    upper_endpoint(k) = U(k) - param(1)/param(2)
     %%%%%%%%%%%%%%%%%% bootstrapping to get ci %%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if ci_bs == 1
     for j=1:50
