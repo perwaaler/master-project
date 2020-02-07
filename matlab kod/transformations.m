@@ -10,16 +10,16 @@ min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
 min_data = min(min_data,[],2)
 
 % find minimum and maximum thresholds based on amount of data to be used
-u_minmax = find_threshold(min_data, 0.07, 0.7)
+u_minmax = find_threshold(min_data, 0.3, 0.7)
 u_l = u_minmax(1);
 u_u = u_minmax(2);
 
 clf;plot(min_data,'.'); hold on; plot(ones(1,length(min_data))*u_l); plot(ones(1,length(min_data))*u_u)
-ylim([-1,40])
+ylim([-1,30])
 %% transforming data and plotting transformed data and thresholds
 % transforms
 transinv = @(x)1./(delta + x).^p;
-transex = @(x)exp(-0.5*(x - 2));
+transex = @(x)exp(-0.3*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -39,11 +39,12 @@ plot(ones(1,Nenc)*u_l_trans); plot(ones(1,Nenc)*u_u_trans);ylim([trans(30),trans
 trans_data = trans_data(:);
 exceed = trans_data(find(trans_data > u_l_trans));
 negL = @(par,exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );
-init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.5])
+init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.3])
 %% Fit models for range of thresholds and show diagnostic plots
-shake_guess = 0.1;                   % variance of noise that gets added to initial guess when stuck
-Nenc = length(data_matrix(:,1));         % number of encounters
-compute_ci = 1;                    % set equal to one if confidence intervals for xi are desired
+shake_guess = 0.1;                 % variance of noise that gets added to initial guess when stuck
+Nenc = length(data_matrix(:,1));   % number of encounters
+Nexp = length(data_matrix(1,:));   % number of values per row. If surrogate-measure is determenistic, then Nexp=1.
+compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
 Nbs = 100;                         % number of bootstrapped samples to compute standard error
 trans_data = trans(data_matrix);   
 m = 10;                                                    % number of thresholds used for estimation
@@ -59,11 +60,12 @@ p_nea = zeros(1,m)*nan;                                    % collects estimated 
 ue_save = zeros(1,m)*nan;                                  % collects estimated upper endpoint
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
-
 logit = 0;                                               % set to plot logarithm of p_nea
+qqplot = 0;
+pause_length = 0.8;
+
 for k=1:m
     k
-    pause(0.0)
     data = trans_data(:);
     exceed = data(find(data>U(k)));
     param = fminsearch(@(par) negL(par,exceed,U(k)),init);
@@ -74,11 +76,21 @@ for k=1:m
     end
     param_save(:,k) = param;
     p_u = length(exceed)/length(data);
-    p_nea(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );% * p_EA
+    p_nea(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );
     ue = U(k) - param(1)/param(2);
-    if param(2)<0; ue_save(k) = ue; end
+    if param(2)<0; ue_save(k) = ue; end 
     
+    if qqplot == 1; 
+        col_ind = randsample(Nexp,Nenc, true)';
+        ind = sub2ind(size(trans_data),[1:Nenc], col_ind );
+        ttc_sample = trans_data(ind); 
+        exceed = ttc_sample(find(ttc_sample>U(k)));
+        qq_plot(exceed,param(1),param(2),U(k),k);
+        pause(pause_length)
+    end
+
     init = param;
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%% bootstrapping %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if compute_ci == 1
         
@@ -91,11 +103,13 @@ for k=1:m
             param_bs =  fminsearch(@(par) negL(par,exceed,U(k)),init);                           % estimate parameters
             init_temp = init;
             while_counter = 1;
+            
             while param_bs == init_temp 
                 while_counter = while_counter + 1;
                 % in case initial guess is bad
                 init_temp = [max(0.1, init(1) + normrnd(0,shake_guess^2)), init(2) + normrnd(0,shake_guess^2)];
                 param_bs = fminsearch(@(par) negL(par,exceed,U(k)),init_temp);
+                
                 if while_counter==300; param_bs = [nan,nan]; break; end
             end
             p_u = length(exceed)/length(data);
@@ -125,8 +139,7 @@ for k=1:m
         ci_p_nea_u(:,k) = ci_p_nea';
         
     end
-
-
+    
 end
 
 clf;
@@ -172,5 +185,8 @@ end
 %% estimating p(collision type i)
 p_interactive = (sum(enc_type==-1) + sum(enc_type==-2) + sum(enc_type==2))/N; % probability of encounter being interactive
 
-p_interactive*p_nea(9)
+% this estimator gives P(C1) when p_nea is based on danger_FEA
+p_interactive*p_nea(10)
+
+
 
