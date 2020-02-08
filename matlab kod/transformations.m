@@ -1,9 +1,11 @@
 %% Estimation of P(collision)
 % this code is used to take simulated data and perform POT method to
 % estimate P(collision). Data_matrix  can be either danger_FEA, DAFEA, X,
-% or danger_max_EA. remember to 
+% or danger_max_EA. data_type=1 --> danger_FEA or DAFEA, data_type=2 --> X,
+% data_type=3 --> danger_max_EA
 %% Initial plots
-data_matrix = DAFEA; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_type = 3;
+data_matrix = danger_max_EA'; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
@@ -19,7 +21,7 @@ ylim([-1,30])
 %% transforming data and plotting transformed data and thresholds
 % transforms
 transinv = @(x)1./(delta + x).^p;
-transex = @(x)exp(-0.3*(x - 2));
+transex = @(x)exp(-2*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -43,7 +45,7 @@ init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.3])
 %% Fit models for range of thresholds and show diagnostic plots
 shake_guess = 0.1;                 % variance of noise that gets added to initial guess when stuck
 Nenc = length(data_matrix(:,1));   % number of encounters
-Nexp = length(data_matrix(1,:));   % number of values per row. If surrogate-measure is determenistic, then Nexp=1.
+Nexp = length(data_matrix(1,:));   % number of values per row. If surrogate-measure is deterministic, then Nexp=1.
 compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
 Nbs = 100;                         % number of bootstrapped samples to compute standard error
 trans_data = trans(data_matrix);   
@@ -56,13 +58,13 @@ ci_xi_u = zeros(2,m)*nan;                                      % collects 95% ci
 ci_p_nea_u = zeros(2,m)*nan;
 
 param_save = zeros(2,m);
-p_nea = zeros(1,m)*nan;                                    % collects estimated collision probability for each threshold
+pc = zeros(1,m)*nan;                                    % collects estimated collision probability for each threshold
 ue_save = zeros(1,m)*nan;                                  % collects estimated upper endpoint
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
 logit = 0;                                               % set to plot logarithm of p_nea
-qqplot = 0;
-pause_length = 0.8;
+qqplot = 1;
+pause_length = 3;
 
 for k=1:m
     k
@@ -76,7 +78,7 @@ for k=1:m
     end
     param_save(:,k) = param;
     p_u = length(exceed)/length(data);
-    p_nea(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );
+    pc(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );
     ue = U(k) - param(1)/param(2);
     if param(2)<0; ue_save(k) = ue; end 
     
@@ -85,7 +87,15 @@ for k=1:m
         ind = sub2ind(size(trans_data),[1:Nenc], col_ind );
         ttc_sample = trans_data(ind); 
         exceed = ttc_sample(find(ttc_sample>U(k)));
-        qq_plot(exceed,param(1),param(2),U(k),k);
+        excess = exceed - U(k);
+        clf
+        subplot(211)
+            qq_plot(exceed,param(1),param(2),U(k),k)
+        subplot(212)
+            histogram(excess,50,'Normalization','probability'); hold on
+            plot(linspace(0,max(excess)*1.5,100), gppdf(linspace(0,max(excess)*1.5,100),param(2),param(1),0) )
+            hold off
+            
         pause(pause_length)
     end
 
@@ -132,7 +142,7 @@ for k=1:m
         
         ci_sigma = param(1) + [-1 1]*1.96*se_sigma; ci_sigma = sort(ci_sigma);
         ci_xi = param(2) + [-1 1]*1.96*se_xi; ci_xi = sort(ci_xi);
-        ci_p_nea = p_nea(k) + [-1 1]*1.96*se_p_nea; ci_p_nea = sort(ci_p_nea);
+        ci_p_nea = pc(k) + [-1 1]*1.96*se_p_nea; ci_p_nea = sort(ci_p_nea);
         
         ci_sigma_u(:,k) = ci_sigma';
         ci_xi_u(:,k) = ci_xi';
@@ -167,14 +177,14 @@ if min(param_save(2,:))<0
 end
 subplot(224)    
 if logit==1
-    plot(U,log10(p_nea))
+    plot(U,log10(pc))
     title('log(p_{est})')
     if compute_ci == 1
         hold on
         plot(U,ci_p_nea_u)
     end
 else
-    plot(U,p_nea)
+    plot(U,pc)
     title('log(p_{est})')
     if compute_ci == 1
         hold on
@@ -184,9 +194,30 @@ end
 
 %% estimating p(collision type i)
 p_interactive = (sum(enc_type==-1) + sum(enc_type==-2) + sum(enc_type==2))/N; % probability of encounter being interactive
+p_ea = (sum(enc_type==-1)+sum(enc_type==-2))/N
+% this estimator gives P(C1,NEA) when p_nea is based on danger at first
+% interactive action, DAFEA or danger_FEA
+if data_type == 1
+    p_c1 = p_interactive*pc
+end
 
-% this estimator gives P(C1) when p_nea is based on danger_FEA
-p_interactive*p_nea(10)
+% this estimaor gives P(C, NEA) when p_nea is based on X
+if data_type == 2
+    p_c1 = pc
+end
+
+% this estimaor gives P(C, EA) when p_nea is based on X
+if data_type == 3
+    p_c2 = pc*p_ea
+end
+
+
+%%
+
+subplot(211)
+plot(linspace(0,1,100), exp(linspace(0,1,100)))
+subplot(212)
+plot(linspace(0,1,100), linspace(0,1,100).^2)
 
 
 
