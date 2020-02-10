@@ -4,8 +4,8 @@
 % or danger_max_EA. data_type=1 --> danger_FEA or DAFEA, data_type=2 --> X,
 % data_type=3 --> danger_max_EA
 %% Initial plots
-data_type = 3;
-data_matrix = danger_max_EA'; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_type = 1;
+data_matrix = X; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
@@ -20,8 +20,9 @@ clf;plot(min_data,'.'); hold on; plot(ones(1,length(min_data))*u_l); plot(ones(1
 ylim([-1,30])
 %% transforming data and plotting transformed data and thresholds
 % transforms
-transinv = @(x)1./(delta + x).^p;
-transex = @(x)exp(-2*(x - 2));
+p = 2;
+transinv = @(x)1./(0.1 + x).^p;
+transex = @(x)exp(-0.7*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -36,7 +37,7 @@ u_u_trans = u_min_max(2);
 trans_data = trans(data_matrix);
 
 clf; plot(max(trans_data,[],2),'.'); hold on
-plot(ones(1,Nenc)*u_l_trans); plot(ones(1,Nenc)*u_u_trans);ylim([trans(30),trans(0)])
+plot(ones(1,Nenc)*u_l_trans); plot(ones(1,Nenc)*u_u_trans);ylim([trans(30),trans(0)*1.7])
 %% ensure good initial value!
 trans_data = trans_data(:);
 exceed = trans_data(find(trans_data > u_l_trans));
@@ -46,7 +47,6 @@ init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.3])
 shake_guess = 0.1;                 % variance of noise that gets added to initial guess when stuck
 Nenc = length(data_matrix(:,1));   % number of encounters
 Nexp = length(data_matrix(1,:));   % number of values per row. If surrogate-measure is deterministic, then Nexp=1.
-compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
 Nbs = 100;                         % number of bootstrapped samples to compute standard error
 trans_data = trans(data_matrix);   
 m = 10;                                                    % number of thresholds used for estimation
@@ -62,9 +62,10 @@ pc = zeros(1,m)*nan;                                    % collects estimated col
 ue_save = zeros(1,m)*nan;                                  % collects estimated upper endpoint
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
-logit = 0;                                               % set to plot logarithm of p_nea
+logit = 1;                                               % set to plot logarithm of p_nea when magnitude of p_nea varies alot
+compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
 qqplot = 1;
-pause_length = 3;
+pause_length = 1;
 
 for k=1:m
     k
@@ -72,9 +73,15 @@ for k=1:m
     exceed = data(find(data>U(k)));
     param = fminsearch(@(par) negL(par,exceed,U(k)),init);
     init_temp = init;
+    while_counter = 0;
     while param == init_temp                                                    % in case initial guess is bad
+        while_counter = while_counter + 1;
         init_temp = [max(0.1, init(1) + normrnd(0,shake_guess^2)), init(2) + normrnd(0,shake_guess^2)];
         param = fminsearch(@(par) negL(par,exceed,U(k)),init_temp);
+        if while_counter == 10
+            break
+            'pick better initial value'
+        end
     end
     param_save(:,k) = param;
     p_u = length(exceed)/length(data);
@@ -92,7 +99,7 @@ for k=1:m
         subplot(211)
             qq_plot(exceed,param(1),param(2),U(k),k)
         subplot(212)
-            histogram(excess,50,'Normalization','probability'); hold on
+            histogram(excess,'Normalization','probability'); hold on
             plot(linspace(0,max(excess)*1.5,100), gppdf(linspace(0,max(excess)*1.5,100),param(2),param(1),0) )
             hold off
             
@@ -185,7 +192,7 @@ if logit==1
     end
 else
     plot(U,pc)
-    title('log(p_{est})')
+    title('p_{est}')
     if compute_ci == 1
         hold on
         plot(U,ci_p_nea_u)
@@ -210,14 +217,4 @@ end
 if data_type == 3
     p_c2 = pc*p_ea
 end
-
-
-%%
-
-subplot(211)
-plot(linspace(0,1,100), exp(linspace(0,1,100)))
-subplot(212)
-plot(linspace(0,1,100), linspace(0,1,100).^2)
-
-
 

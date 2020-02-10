@@ -1,4 +1,0 @@
-negL = @(par, data, u) -sum(log(gppdf(data,par(2),par(1),u)));
-init = [0.5638   -1.4094]
-options = optimset('PlotFcns',"@optimplotfval, MaxFunEvals=100);
-[par_beta, fcnval, exitflag] = fminsearch(@(par) negL(par, [0.1 0.2 0.4], 0), init, options)
