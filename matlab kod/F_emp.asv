@@ -1,15 +1,45 @@
 function out = F_emp(x, data)
+% empirical distribution function of sample data evaluated at x. x can be a
+% point or a row vector, and data can be a row vector or a matrix where
+% each row contains a sample from some distribution. Returns a matrix where
+% row i is the empirical d.f. corresponding to row_i(data) evaluated at the
+% points in x. if the samples contains different number of obeservations,
+% sample
 
- x=linspace(0,10,100)
- nn = length(x)
- data = [1:10]%exprnd(ones(1,1000))
- 
+x = linspace(0,9,1000);
+data = exprnd(ones(3,100))
+sample_size = size(data,2);  % size of each sample, with nans
+data(:,end) = [nan;nan;nan]
+data(1,2) = nan
+data(3,1:10) = nan*zeros(1,10)
+nan_ind = isnan(data)
+n_nan = sum(nan_ind,2)       % number of nan's for each row
+nn = sample_size - n_nan
+data(nan_ind) = zeros(1,sum(n_nan))
 
-ordered_sample = sort(data)
-ordered_sample(ones(1,nn),:)
-interval_index = sum(x-ordered_sample>=0) + 1
+if size(x,1)>size(x,2)
+ x = x';
+end
 
-out = (interval_index - 1)/length(data)
+n_eval = size(x,2); 
+n_samples = size(data,1);    % number of samples
 
+% correction term and factor
+nan_sub = (n_nan./(nn+n_nan) * ones(1,n_eval))'
+nan_sub = nan_sub(:)
+
+nan_mult = 1./(1 - nan_sub); 
+
+n_copies = ([1:n_samples]'*ones(1,n_eval))'; 
+n_copies = n_copies(:);
+
+xx = x(ones(1,n_samples),:)';
+xx = xx(:);
+ordered_sample = sort(data,2);
+ordered_sample = ordered_sample(n_copies,:); % constructs a matrix where the first nn rows are row 1, followed by nn copies of row 2 etc...
+interval_index = sum(xx-ordered_sample >= 0, 2);
+
+out = (interval_index/sample_size - nan_sub).*nan_mult;
+out = vec2mat(out,n_eval);
 
 end

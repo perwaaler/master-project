@@ -5,14 +5,14 @@
 % data_type=3 --> danger_max_EA
 %% Initial plots
 data_type = 1;
-data_matrix = X; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_matrix = danger_FEA; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
 min_data = min(min_data,[],2)
 
 % find minimum and maximum thresholds based on amount of data to be used
-u_minmax = find_threshold(min_data, 0.3, 0.7)
+u_minmax = find_threshold(min_data, 0.2, 0.7)
 u_l = u_minmax(1);
 u_u = u_minmax(2);
 
@@ -22,7 +22,7 @@ ylim([-1,30])
 % transforms
 p = 2;
 transinv = @(x)1./(0.1 + x).^p;
-transex = @(x)exp(-0.7*(x - 2));
+transex = @(x)exp(-0.6*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -63,9 +63,13 @@ ue_save = zeros(1,m)*nan;                                  % collects estimated 
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
 logit = 1;                                               % set to plot logarithm of p_nea when magnitude of p_nea varies alot
-compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
+compute_ci = 1;                    % set equal to one if confidence intervals for xi are desired
 qqplot = 1;
-pause_length = 1;
+pause_length = 1.5;
+% limits for plots of empirical and model distribution functions
+xplot_lower = 0;
+xplot_upper = 2.5;
+n_eval_cdf = 1000;    % number of points where cdf gets evaluated
 
 for k=1:m
     k
@@ -89,19 +93,40 @@ for k=1:m
     ue = U(k) - param(1)/param(2);
     if param(2)<0; ue_save(k) = ue; end 
     
-    if qqplot == 1; 
+    if qqplot == 1;
+        %%% compute empirical d.f. for excesses
+        exceed_data = trans_data(    find(max(trans_data,[],2) > U(k)) ,:   );   % keeps only rows with atleast one obs. above threshold
+        pu_i = sum(exceed_data>U(k), 2)/ size(trans_data,2);                   % probability to exceed threshold for each encounter
+        weights = pu_i/sum(pu_i) ;                                           %
+
+        % replace obs. below u with nan's
+        below_u = find(exceed_data<=U(k));
+        exceed_data(below_u) = nan*ones(1,length(below_u));
+        exceed_data = exceed_data - U(k); % subtract u to get excessses
+
+        % evaluate empirical distribution function
+        x_eval = linspace(xplot_lower, xplot_upper, n_eval_cdf);
+        femp = weights'*F_emp(x_eval, exceed_data);
+
+        %%% generate sample of stochastic ttc, where one sample is drawn from each encounter.                   
         col_ind = randsample(Nexp,Nenc, true)';
-        ind = sub2ind(size(trans_data),[1:Nenc], col_ind );
+        ind = sub2ind(size(trans_data), 1:Nenc, col_ind );
         ttc_sample = trans_data(ind); 
         exceed = ttc_sample(find(ttc_sample>U(k)));
         excess = exceed - U(k);
+        
         clf
         subplot(211)
             qq_plot(exceed,param(1),param(2),U(k),k)
         subplot(212)
-            histogram(excess,'Normalization','probability'); hold on
-            plot(linspace(0,max(excess)*1.5,100), gppdf(linspace(0,max(excess)*1.5,100),param(2),param(1),0) )
-            hold off
+            plot(x_eval,femp,'.')
+            hold on 
+            plot(x_eval, gpcdf(x_eval, param(2), param(1), 0))
+            line(trans([0,0]), 1.2,'LineStyle','--');
+            line(get(gca, 'xlim'), [1 1],'Color','green','LineStyle','--');
+%             histogram(excess,'Normalization','probability'); hold on
+%             plot(linspace(0,max(excess)*1.5,100), gppdf(linspace(0,max(excess)*1.5,100),param(2),param(1),0) )
+%             hold off
             
         pause(pause_length)
     end

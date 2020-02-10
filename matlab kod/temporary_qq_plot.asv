@@ -1,0 +1,7 @@
+
+no_exceed_index = find((trans_data > 0.2)==0) % gives linear index of all obs. exceeding threshold
+n_exceed = 
+data_copy = trans_data
+
+data_copy(no_exceed_index) = zeros(1,length(no_exceed_index))*nan
+

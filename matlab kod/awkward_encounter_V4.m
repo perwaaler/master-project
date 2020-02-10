@@ -34,7 +34,7 @@ thetavar0 = 0.015;                      % variance of initial theta
 r = 0.06;                               % collision radius of each person
 xinit = 6;                              % determines how far apart they are at the start
 sigma = 0.3;                            % variance of initial starting position
-N = 500;                                % number of encounters
+N = 2000;                                % number of encounters
 NTTC = 100;                             % Number of TTC to sample at first evasive action for each encounter
 danger_FEA = nan*zeros(N,1);            % danger index at time of first evasive action
 DAFEA = ones(N, NTTC)*nan;              % Saves danger at first moment of evasive action; each row contains NTTC sampled ttc values
@@ -202,7 +202,7 @@ sum(enc_type==2)   % print to keep track of number of pure collisions
 end
 
 % remove all elements/rows corresponding to encounters with no EA
-danger_FEA = danger_FEA(find(danger_FEA<1000));
+danger_FEA = danger_FEA(find(danger_FEA<Inf));
 X = DAFEA;
 DAFEA(find(enc_type==1),:) = [];
 danger_max_EA(find(enc_type==1),:) = [];
@@ -217,11 +217,11 @@ B_NEA = B_save(find(enc_type==1),:);
 diff_NEA = A_NEA - B_NEA;
 real_diff_NEA = real(diff_NEA);
 norm_diff_NEA = sqrt(conj(diff_NEA).*diff_NEA);
-ttc_dist_save = ones(N_enc_type1, NTTC)*1000;
+ttc_dist_save = ones(N_enc_type1, NTTC)*Inf;
 for i=1:N_enc_type1
     i
-    ttc_dist = ones(500, NTTC)*1000;
-    ttc_min = 1000;
+    ttc_dist = ones(500, NTTC)*Inf;
+    ttc_min = Inf;
     min_ttc_index = 1;
 %     if min(norm_diff_NEA(i,:))>2
 %         continue
@@ -237,7 +237,7 @@ for i=1:N_enc_type1
                 
                 for k=1:NTTC
                     ttc = ttc_simulator_double_momentum_improved(A0,B0,stepsize,theta,min_stepsize,var_step,r, thetavar, stability_fac);
-                    if ttc< 1000
+                    if ttc< Inf
                         pause(0.0)
                     end
                     if ttc < ttc_min

@@ -52,7 +52,7 @@ else
     
     %if no collision has occured, set:
     if ttc==1i
-        out = 1000;
+        out = Inf;
     end
 end
 end
