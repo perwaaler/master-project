@@ -1,0 +1,28 @@
+I just had an insight into why ttc stochastic performs better as a surrogate measure than minimum distance.
+I've noticed that a commonality amongst all the instances where I get poor estimates is when I have few
+outliers. Getting good estimates is not just a matter of getting extreme observations, as in being close to zero,
+but also how many such values one gets.
+
+Lets say that we observe an event that was extreme, as in close to a collision. What that means is that
+
+Can we give any kind of rough outline for what constitutes a good indicator of danger, that is a good surrogate measure.
+A good surrogate measure is one for which there is a smooth distribution function, all the way from the extreme
+to the less extreme part of the distribution. Roughly speaking, a bad indicator is a random variable for which
+the tails are hard to estimate based on less extreme observations, such that a large amounts of data is required in
+order to get a decent estimate. An example of a bad surrogate measure is for the purposes of applying EVT is
+the indicator function for collision. It satisfies the requirement that X<0 <--> collision, but it has a
+discontinuous distribution function, and non-extreme data is pretty much worthless for making inference about
+the tail of the distribution. From this, we can guess that any random variable which has a distribution function
+which has a distribution function close to that of X is going to exhibit similar drawbacks if we were to apply EVT to
+make inference about the tails. It is the sudden drop-off as we get to the tail that causes this un-suitableness
+for EVT to be applied. Based on this discussion, we may guess that any random variable that has the tendency to
+cluster above a certain threshold will be ill-suited to the task of being a surrogate measure. We want a surrogate
+measure that distinguishes events that are rare - and thus provides information about the tail - from events that
+are common. Based on this, we expect the minimum distance to be a less suitable surrogate measure than minimum TTC,
+because minimum distance will sometimes fail to distinguish a dangerous encounter from a safe one; it is possible for
+two encounters to have the same minimum distance, yet be radically different in terms of perceived danger.
+
+Intuitively, encounters where only a small modification of behavior would result in a collisions are considered to contain more information
+about the safety level of an intersection than encounters where a large modification is required. For instance, if
+only a very small delay in reaction time would be sufficient for the encounter to result in a collision, that would
+tilt us towards believing the intersection is dangerous. If

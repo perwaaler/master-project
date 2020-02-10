@@ -34,7 +34,7 @@ thetavar0 = 0.015;                      % variance of initial theta
 r = 0.06;                               % collision radius of each person
 xinit = 6;                              % determines how far apart they are at the start
 sigma = 0.3;                            % variance of initial starting position
-N = 1000;                                % number of encounters
+N = 500;                                % number of encounters
 NTTC = 100;                             % Number of TTC to sample at first evasive action for each encounter
 danger_FEA = nan*zeros(N,1);            % danger index at time of first evasive action
 DAFEA = ones(N, NTTC)*nan;              % Saves danger at first moment of evasive action; each row contains NTTC sampled ttc values
@@ -212,7 +212,6 @@ danger_max_nodetec = danger_max_nodetec( find(isnan(danger_max_nodetec)==0) );
 
 %% Compute minimum ttc for all encounters where there was no evasive action
 N_enc_type1 = sum(enc_type==1);
-%NTTC = 200;                         % determines how many ttc samples to draw at each timeframe
 A_NEA = A_save(find(enc_type==1),:);
 B_NEA = B_save(find(enc_type==1),:);
 diff_NEA = A_NEA - B_NEA;
@@ -230,8 +229,7 @@ for i=1:N_enc_type1
     
     for j=1:100
         t = norm_diff_NEA(i,j)/(A_stepsize_save(i) + B_stepsize_save(i));
-        if real_diff_NEA(i,j)<0   &   t < 4    &     min(norm_diff_NEA(i,:)) < 2
-                clf;plot(norm_diff_NEA(i,:)); title('scary')
+        if real_diff_NEA(i,j)<0   &   t < 6    &     min(norm_diff_NEA(i,:)) < 4
                 A0 = A_NEA(i,j);
                 B0 = B_NEA(i,j);
                 theta = [A_theta_save(i,j), B_theta_save(i,j)];

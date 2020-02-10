@@ -1,25 +1,28 @@
 %% Estimation of P(collision)
 % this code is used to take simulated data and perform POT method to
 % estimate P(collision). Data_matrix  can be either danger_FEA, DAFEA, X,
-% or danger_max_EA. remember to 
+% or danger_max_EA. data_type=1 --> danger_FEA or DAFEA, data_type=2 --> X,
+% data_type=3 --> danger_max_EA
 %% Initial plots
-data_matrix = DAFEA; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_type = 1;
+data_matrix = X; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
 min_data = min(min_data,[],2)
 
 % find minimum and maximum thresholds based on amount of data to be used
-u_minmax = find_threshold(min_data, 0.07, 0.7)
+u_minmax = find_threshold(min_data, 0.3, 0.7)
 u_l = u_minmax(1);
 u_u = u_minmax(2);
 
 clf;plot(min_data,'.'); hold on; plot(ones(1,length(min_data))*u_l); plot(ones(1,length(min_data))*u_u)
-ylim([-1,40])
+ylim([-1,30])
 %% transforming data and plotting transformed data and thresholds
 % transforms
-transinv = @(x)1./(delta + x).^p;
-transex = @(x)exp(-0.5*(x - 2));
+p = 2;
+transinv = @(x)1./(0.1 + x).^p;
+transex = @(x)exp(-0.7*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -34,16 +37,16 @@ u_u_trans = u_min_max(2);
 trans_data = trans(data_matrix);
 
 clf; plot(max(trans_data,[],2),'.'); hold on
-plot(ones(1,Nenc)*u_l_trans); plot(ones(1,Nenc)*u_u_trans);ylim([trans(30),trans(0)])
+plot(ones(1,Nenc)*u_l_trans); plot(ones(1,Nenc)*u_u_trans);ylim([trans(30),trans(0)*1.7])
 %% ensure good initial value!
 trans_data = trans_data(:);
 exceed = trans_data(find(trans_data > u_l_trans));
 negL = @(par,exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );
-init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.5])
+init = fminsearch(@(par) negL(par, exceed, u_l_trans), [3 0.3])
 %% Fit models for range of thresholds and show diagnostic plots
-shake_guess = 0.1;                   % variance of noise that gets added to initial guess when stuck
-Nenc = length(data_matrix(:,1));         % number of encounters
-compute_ci = 1;                    % set equal to one if confidence intervals for xi are desired
+shake_guess = 0.1;                 % variance of noise that gets added to initial guess when stuck
+Nenc = length(data_matrix(:,1));   % number of encounters
+Nexp = length(data_matrix(1,:));   % number of values per row. If surrogate-measure is deterministic, then Nexp=1.
 Nbs = 100;                         % number of bootstrapped samples to compute standard error
 trans_data = trans(data_matrix);   
 m = 10;                                                    % number of thresholds used for estimation
@@ -55,30 +58,56 @@ ci_xi_u = zeros(2,m)*nan;                                      % collects 95% ci
 ci_p_nea_u = zeros(2,m)*nan;
 
 param_save = zeros(2,m);
-p_nea = zeros(1,m)*nan;                                    % collects estimated collision probability for each threshold
+pc = zeros(1,m)*nan;                                    % collects estimated collision probability for each threshold
 ue_save = zeros(1,m)*nan;                                  % collects estimated upper endpoint
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
+logit = 1;                                               % set to plot logarithm of p_nea when magnitude of p_nea varies alot
+compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
+qqplot = 1;
+pause_length = 1;
 
-logit = 0;                                               % set to plot logarithm of p_nea
 for k=1:m
     k
-    pause(0.0)
     data = trans_data(:);
     exceed = data(find(data>U(k)));
     param = fminsearch(@(par) negL(par,exceed,U(k)),init);
     init_temp = init;
+    while_counter = 0;
     while param == init_temp                                                    % in case initial guess is bad
+        while_counter = while_counter + 1;
         init_temp = [max(0.1, init(1) + normrnd(0,shake_guess^2)), init(2) + normrnd(0,shake_guess^2)];
         param = fminsearch(@(par) negL(par,exceed,U(k)),init_temp);
+        if while_counter == 10
+            break
+            'pick better initial value'
+        end
     end
     param_save(:,k) = param;
     p_u = length(exceed)/length(data);
-    p_nea(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );% * p_EA
+    pc(k) = p_u*(1 - gpcdf(trans(0), param(2), param(1),U(k)) );
     ue = U(k) - param(1)/param(2);
-    if param(2)<0; ue_save(k) = ue; end
+    if param(2)<0; ue_save(k) = ue; end 
     
+    if qqplot == 1; 
+        col_ind = randsample(Nexp,Nenc, true)';
+        ind = sub2ind(size(trans_data),[1:Nenc], col_ind );
+        ttc_sample = trans_data(ind); 
+        exceed = ttc_sample(find(ttc_sample>U(k)));
+        excess = exceed - U(k);
+        clf
+        subplot(211)
+            qq_plot(exceed,param(1),param(2),U(k),k)
+        subplot(212)
+            histogram(excess,'Normalization','probability'); hold on
+            plot(linspace(0,max(excess)*1.5,100), gppdf(linspace(0,max(excess)*1.5,100),param(2),param(1),0) )
+            hold off
+            
+        pause(pause_length)
+    end
+
     init = param;
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%% bootstrapping %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if compute_ci == 1
         
@@ -91,11 +120,13 @@ for k=1:m
             param_bs =  fminsearch(@(par) negL(par,exceed,U(k)),init);                           % estimate parameters
             init_temp = init;
             while_counter = 1;
+            
             while param_bs == init_temp 
                 while_counter = while_counter + 1;
                 % in case initial guess is bad
                 init_temp = [max(0.1, init(1) + normrnd(0,shake_guess^2)), init(2) + normrnd(0,shake_guess^2)];
                 param_bs = fminsearch(@(par) negL(par,exceed,U(k)),init_temp);
+                
                 if while_counter==300; param_bs = [nan,nan]; break; end
             end
             p_u = length(exceed)/length(data);
@@ -118,15 +149,14 @@ for k=1:m
         
         ci_sigma = param(1) + [-1 1]*1.96*se_sigma; ci_sigma = sort(ci_sigma);
         ci_xi = param(2) + [-1 1]*1.96*se_xi; ci_xi = sort(ci_xi);
-        ci_p_nea = p_nea(k) + [-1 1]*1.96*se_p_nea; ci_p_nea = sort(ci_p_nea);
+        ci_p_nea = pc(k) + [-1 1]*1.96*se_p_nea; ci_p_nea = sort(ci_p_nea);
         
         ci_sigma_u(:,k) = ci_sigma';
         ci_xi_u(:,k) = ci_xi';
         ci_p_nea_u(:,k) = ci_p_nea';
         
     end
-
-
+    
 end
 
 clf;
@@ -154,15 +184,15 @@ if min(param_save(2,:))<0
 end
 subplot(224)    
 if logit==1
-    plot(U,log10(p_nea))
+    plot(U,log10(pc))
     title('log(p_{est})')
     if compute_ci == 1
         hold on
         plot(U,ci_p_nea_u)
     end
 else
-    plot(U,p_nea)
-    title('log(p_{est})')
+    plot(U,pc)
+    title('p_{est}')
     if compute_ci == 1
         hold on
         plot(U,ci_p_nea_u)
@@ -171,6 +201,20 @@ end
 
 %% estimating p(collision type i)
 p_interactive = (sum(enc_type==-1) + sum(enc_type==-2) + sum(enc_type==2))/N; % probability of encounter being interactive
+p_ea = (sum(enc_type==-1)+sum(enc_type==-2))/N
+% this estimator gives P(C1,NEA) when p_nea is based on danger at first
+% interactive action, DAFEA or danger_FEA
+if data_type == 1
+    p_c1 = p_interactive*pc
+end
 
-p_interactive*p_nea(9)
+% this estimaor gives P(C, NEA) when p_nea is based on X
+if data_type == 2
+    p_c1 = pc
+end
+
+% this estimaor gives P(C, EA) when p_nea is based on X
+if data_type == 3
+    p_c2 = pc*p_ea
+end
 

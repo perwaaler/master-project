@@ -1,0 +1,15 @@
+function out = F_emp(x, data)
+
+ x=linspace(0,10,100)
+ nn = length(x)
+ data = [1:10]%exprnd(ones(1,1000))
+ 
+
+ordered_sample = sort(data)
+ordered_sample(ones(1,nn),:)
+interval_index = sum(x-ordered_sample>=0) + 1
+
+out = (interval_index - 1)/length(data)
+
+
+end
