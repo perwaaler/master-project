@@ -1,0 +1,10 @@
+function out = qqplot(exceed_data,shape,scale,u)
+F_inv = @(y,scale,shape) scale/shape*((1-y).^-shape - 1);
+N =  length(exceed_data);
+excesses = exceed_data - u;
+clf 
+plot(sort(beta_excess), F_inv( [1:N_beta] /(N_beta+1), par_beta(1),par_beta(2)) ,'.');
+hold on
+plot(sort(beta_excess), sort(beta_excess)); hold off 
+title('no transformation')
+
