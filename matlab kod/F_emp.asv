@@ -4,33 +4,27 @@ function out = F_emp(x, data)
 % each row contains a sample from some distribution. Returns a matrix where
 % row i is the empirical d.f. corresponding to row_i(data) evaluated at the
 % points in x. if the samples contains different number of obeservations,
-% sample
+% sample matrix should be padded with nan's.
+data = exprnd()
 
-x = linspace(0,9,1000);
-data = exprnd(ones(3,100))
-sample_size = size(data,2);  % size of each sample, with nans
-data(:,end) = [nan;nan;nan]
-data(1,2) = nan
-data(3,1:10) = nan*zeros(1,10)
-nan_ind = isnan(data)
-n_nan = sum(nan_ind,2)       % number of nan's for each row
-nn = sample_size - n_nan
-data(nan_ind) = zeros(1,sum(n_nan))
+sample_size = size(data,2);          % size of each sample, nan's included
+nan_ind = isnan(data);               % index of nan's
+n_nan = sum(nan_ind,2);              % number of nan's for each row
+data(nan_ind) = zeros(1,sum(n_nan)); % replace nan's with zeros
 
 if size(x,1)>size(x,2)
  x = x';
 end
 
-n_eval = size(x,2); 
+n_eval = size(x,2);          % number of points for which the emp. dist. gets evaluated
 n_samples = size(data,1);    % number of samples
 
 % correction term and factor
-nan_sub = (n_nan./(nn+n_nan) * ones(1,n_eval))'
-nan_sub = nan_sub(:)
-
+nan_sub = (n_nan./sample_size * ones(1,n_eval))';
+nan_sub = nan_sub(:);
 nan_mult = 1./(1 - nan_sub); 
 
-n_copies = ([1:n_samples]'*ones(1,n_eval))'; 
+n_copies = ((1:n_samples)'*ones(1,n_eval))'; 
 n_copies = n_copies(:);
 
 xx = x(ones(1,n_samples),:)';

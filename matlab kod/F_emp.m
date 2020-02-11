@@ -30,9 +30,10 @@ xx = x(ones(1,n_samples),:)';
 xx = xx(:);
 ordered_sample = sort(data,2);
 ordered_sample = ordered_sample(n_copies,:); % constructs a matrix where the first nn rows are row 1, followed by nn copies of row 2 etc...
-interval_index = sum(xx-ordered_sample >= 0, 2);
+interval_index = sum(xx >= ordered_sample , 2);
 
 out = (interval_index/sample_size - nan_sub).*nan_mult;
 out = vec2mat(out,n_eval);
+
 
 end

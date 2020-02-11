@@ -5,7 +5,7 @@
 % data_type=3 --> danger_max_EA
 %% Initial plots
 data_type = 1;
-data_matrix = danger_FEA; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_matrix = X; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<1000),:);
@@ -22,7 +22,7 @@ ylim([-1,30])
 % transforms
 p = 2;
 transinv = @(x)1./(0.1 + x).^p;
-transex = @(x)exp(-0.6*(x - 2));
+transex = @(x)exp(-0.5*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -96,8 +96,8 @@ for k=1:m
     if qqplot == 1;
         %%% compute empirical d.f. for excesses
         exceed_data = trans_data(    find(max(trans_data,[],2) > U(k)) ,:   );   % keeps only rows with atleast one obs. above threshold
-        pu_i = sum(exceed_data>U(k), 2)/ size(trans_data,2);                   % probability to exceed threshold for each encounter
-        weights = pu_i/sum(pu_i) ;                                           %
+        pu_i = sum(exceed_data>U(k), 2)/ size(trans_data,2);                     % probability to exceed threshold for each encounter
+        weights = pu_i/sum(pu_i) ;                                          
 
         % replace obs. below u with nan's
         below_u = find(exceed_data<=U(k));
