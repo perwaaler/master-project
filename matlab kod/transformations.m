@@ -4,15 +4,15 @@
 % or danger_max_EA. data_type=1 --> danger_FEA or DAFEA, data_type=2 --> X,
 % data_type=3 --> danger_max_EA
 %% Initial plots
-data_type = 1;
-data_matrix = all_data{6,2}; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
+data_type = 4;
+data_matrix = all_data{1,data_type}; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
 min_data = data_matrix(find(min(data_matrix,[],2)<Inf),:);
 min_data = min(min_data,[],2)
 
 % find minimum and maximum thresholds based on amount of data to be used
-u_minmax = find_threshold(min_data, 0.2, 0.7)
+u_minmax = find_threshold(min_data, 0.2, 0.8)
 u_l = u_minmax(1);
 u_u = u_minmax(2);
 
@@ -21,8 +21,8 @@ ylim([-1,30])
 %% transforming data and plotting transformed data and thresholds
 % transforms
 p = 2;
-transinv = @(x)1./(0.1 + x).^p;
-transex = @(x)exp(-0.4*(x - 2));
+transinv = @(x)1./(3 + x).^p;
+transex = @(x)exp(-0.9*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -65,9 +65,9 @@ ue_save = zeros(1,m)*nan;                                  % collects estimated 
 max_data = max(max(trans_data));                           % largest observed value
 negL = @(par, exceed_data,u) -sum( log(gppdf(exceed_data,par(2),par(1),u)) );  %negative log likelihood fcn.
 logit = 1;                                               % set to plot logarithm of p_nea when magnitude of p_nea varies alot
-compute_ci = 0;                    % set equal to one if confidence intervals for xi are desired
+compute_ci = 1;                    % set equal to one if confidence intervals for xi are desired
 qqplot = 1;
-pause_length = 1.5;
+pause_length = 0;
 % limits for plots of empirical and model distribution functions
 xplot_lower = 0;
 xplot_upper = 1;
@@ -220,14 +220,14 @@ if logit==1
     title('log(p_{est})')
     if compute_ci == 1
         hold on
-        plot(U,ci_p_nea_u)
+        %plot(U,ci_p_nea_u)
     end
 else
     plot(U,pc)
     title('p_{est}')
     if compute_ci == 1
         hold on
-        plot(U,ci_p_nea_u)
+        %plot(U,ci_p_nea_u)
     end
 end
 
