@@ -1,0 +1,73 @@
+slide 1
+hello. I'm a master student taking my master in mathematical statistics. I will give a brief presentation of
+my master thesis on the subject of stochastic TTC that I have done under the supervision of
+Nader and Alieksei. My first challenge was to see if stochastic TTC made sense from a mathematical point, and if
+we could develop necessary equations to combine this sort of data with EVT.
+
+slide 2
+It turned out that yes you can make sense of it, and I derived this equation. I have tested it extensively on
+many different types of simulated data, and it works well. So we had the mathematical framework set-up.
+
+slide 3
+There were some challenges though. We had a fairly good idea at that point of how to use stochastic TTC in
+the cases when there was no evasive-action. for each time-frame of an encounter, we could base the
+estimate of the probability-distribution on previous observation of how vehicles behaved in similar situations.
+The problem is when the vehicles start interaction with each other. Then this empirical approach does not work very well
+because we are unlikely to have many observations to allow us to say how the vehicles are likely to move.
+
+One way to approach this problem is to find a way to split up the data into encounters where there was evasive interaction
+and encounters where there was no evasive action, and analyze them separately. For data where the vehicles try to evade
+each other, we can define TTC-at-first-evasive-action, which is a measure of how dangerous the encounter was the moment before
+the evasive action started. For this measure we can use stochastic-TTC. For encounters with evasive action we can further measure the
+minimum-ttc-during-conflict-resolution. For this measure we still have to decide on what safety-surrogate-measure
+is most appropriate.
+
+slide 4
+(show pictures)
+Here's an example of what samples of such measurements could look like. This is data collected from 500 encounters.
+In the left figure we see that there is data point that dips below the 0 threshold. What  this means is that a collision
+occurred for which the first interaction was the collision itself. What this means is that we can apply EVT to
+this kind of data in order to estimate the probability of collision where there was no attempt to avoid it, i.e. where they
+did not notice each-other at all. Similarly for the figure on the right, a data point below zero means that a collision
+occurred where there was an attempt to avoid it, but it failed. By estimating these two probabilities and adding them
+together, we estimate the probability for collision. For encounters with no evasive action, we can also estimate
+ the probability of collision with no attempt at avoiding it, but I wont go into detail about that herefor the sake of time.
+
+ slide 5
+ In order to test the performance of stochastic-TTC and several different estimation methods, I programmed a simulation of
+ encounters between two road-users heading in opposite directions. The road users are programmed to try to avoid collision,
+ and become more likely to engage in evasive action the closer they get to colliding. This simulation allowed me to test various
+ methods for estimating the collision probability, and see what their statistical properties are like. In the simulation
+ I use 2 different safety-surrogate-measures in order to have something to compare against: separation distance, and stochastic-TTC.
+
+slide 6
+There are many ways to measure how well different methods perform, but here I will focus on 2 results that I find the most
+interesting. One of the important applications of EVT in traffic security is to evaluate which traffic location is safest.
+Therefore, I wanted to set up a test to see how often various methods perform in their ability to produce correct predictions.
+I simulated two sets of data, one where the collision-probability was 8/10^5, and one from a simulation
+representing a more dangerous traffic location where the collision probability was 20/10^5. The procedure is that generate two
+sets of data, with 500 encounters in each set, I estimate the collision probabilities using different methods, and then I use these to
+predict which data set come from the safer traffic-location. This gets repeated many times to see what the success and failure rates are.
+Another performance test was that how likely each method is to produce estimates that deviate from the true value by less than 80%.
+
+slide 7
+(figures)
+Here one the top figure we see the percentage of time each method made a correct prediction. The top two lines correspond to
+predictions made using stochastic TTC, and the one below corresponds to predictions made using separation-distance. Here we can see
+that stochastic TTC gets it right significantly more often. Below we can see how often they made an incorrect prediction, also
+here we can see TTC-stochastic performs better. Note that both plots are needed because the test can be inconclusive, which
+happens when the both estimates are 0, which is the reason why this pink one is so low in both plots.
+
+slide 8
+(accuracy plots)
+Here we can see that stochastic-TTC performs slightly better in terms of being close to the true value; it seems to deviate
+from the true value less than 80% around 5-6% more often.
+
+slide 9
+My conclusion so far is that I think that stochastic TTC seems very promising, and I am very interested 
+to see how well the methods I've investigated will work on real life data. I would also like to
+make the simulation more realistic and add more features to it, so that I can get a better sense
+of how well the conclusions generalize. Lastly, I would like to make the selection of various parameters more
+optimal and objective.
+
+Thanks for listening.

@@ -4,7 +4,7 @@
 % or danger_max_EA. data_type=1 --> danger_FEA or DAFEA, data_type=2 --> X,
 % data_type=3 --> danger_max_EA
 %% Initial plots
-data_type = 4;
+data_type = 1;
 data_matrix = all_data{1,data_type}; % select data. row i should correspond to encounter i, and column j to j'th simulated ttc value (in case of stochastic ttc)
 
 % find encounters with finite ttc values
@@ -18,11 +18,12 @@ u_u = u_minmax(2);
 
 clf;plot(min_data,'.'); hold on; plot(ones(1,length(min_data))*u_l); plot(ones(1,length(min_data))*u_u)
 ylim([-1,30])
+title('untransformed data')
 %% transforming data and plotting transformed data and thresholds
 % transforms
 p = 2;
 transinv = @(x)1./(3 + x).^p;
-transex = @(x)exp(-0.9*(x - 2));
+transex = @(x)exp(-0.4*(x - 2));
 transneg = @(x) -x;
 
 % choose transform to use
@@ -40,6 +41,8 @@ trans_data = trans(data_matrix);
 
 clf; plot(trans(min_data),'.'); hold on
 plot(1:length(min_data),U'*ones(1,length(min_data)), 'k');plot(ones(1,length(min_data))*trans(0));ylim([trans(30),trans(0)*1.1])
+title('transformed data')
+legend('transformed thresholds')
 %% ensure good initial value!
 trans_data = trans_data(:);
 exceed = trans_data(find(trans_data > u_l_trans));

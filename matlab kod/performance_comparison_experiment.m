@@ -1,5 +1,4 @@
 
-
 %% Estimation of P(collision)
 % this code is used to take simulated data and perform POT method to
 % estimate P(collision). Data_matrix  can be either danger_FEA, DAFEA, X,
@@ -7,7 +6,7 @@
 % data_type=3 --> danger_max_EA
 
 
-data_type = 4
+data_type = 2
 L = size(all_data,1);
 m = 10;                                                                % number of thresholds used for estimation
 ue_save_matrix = zeros(L,m);
@@ -19,8 +18,8 @@ p_ea_matrix = all_data{:,8}
 
 
 % transformation parameters
-select_trans = 2;
-p_ex = 1.2;
+select_trans = 1;
+p_ex = 0.6;
 p_inv = 2;
 d_inv = 3;
 
@@ -30,9 +29,9 @@ qqplot = 0;
 save_plot = 0;
 
 % pausing options
-pause_trans = 0.0;
+pause_trans = 0;
 qq_pause = 0.0;
-stability_pause = 0
+stability_pause = 0.0
 
 for l=1:L
 % generate sample of encounters
@@ -289,8 +288,8 @@ pause(stability_pause)
 
 
 %%% estimating p(collision type i)
-p_interactive = (sum(enc_type==-1) + sum(enc_type==-2) + sum(enc_type==2))/N; % probability of encounter being interactive
-p_ea = (sum(enc_type==-1)+sum(enc_type==-2))/N;
+p_interactive = all_data{l,7}; % probability of encounter being interactive
+p_ea = all_data{l,8};
 % this estimator gives P(C1,NEA) when p_nea is based on danger at first
 % interactive action, DAFEA
 if data_type == 1
@@ -319,9 +318,9 @@ end
 %% save information
 hit_rate = sum(pc_save_matrix>0,1)/500*100;
 %%
-save('hit_rate_ex_danger_FEA_6_id4','hit_rate')
-save('pc_ex_danger_FEA_6_id4', 'pc_save_matrix')
-save('p_c_ex_danger_FEA_6_id4', 'p_c_save_matrix')
-save('param_ex_danger_FEA_6_id4', 'param_save_matrix')
-
+save('hit_rate_neg_X_id5','hit_rate')
+save('pc_neg_X_id5', 'pc_save_matrix')
+save('p_neg_X_id5', 'p_c_save_matrix')
+save('param_neg_X_id5', 'param_save_matrix')
+save('ue_neg_X_id5','ue_save_matrix')
 

@@ -20,3 +20,5 @@ ls                             			                    %%see all content of curre
 git push https://github.com/perwaaler/git_1.git master  %%pushes the master branch to the remote repository
 git remote -v                                           %%shows alias and webbadress of remote repository
 git push origin master                                  %%pushes master branch to remote repository
+git fetch
+git reset --hard origin/master                          %%use this two commands to commit to the project folder as  it is on the remote repository
